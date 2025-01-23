@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tupaia - Travel Planner & Budget Estimator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #4CAF50;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    h1 {
+      margin: 0;
+    }
+    .container {
+      max-width: 900px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .section {
+      margin-bottom: 20px;
+    }
+    .section h2 {
+      margin-bottom: 10px;
+      color: #333;
+    }
+    label {
+      display: block;
+      margin: 10px 0;
+      font-weight: bold;
+    }
+    input, select, button, textarea {
+      padding: 12px;
+      width: 100%;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+      border: none;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    #result {
+      font-weight: bold;
+      color: #333;
+    }
+    .destination-list {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+    }
+    .destination {
+      flex: 1;
+      text-align: center;
+    }
+    .destination img {
+      width: 100%;
+      max-width: 300px;
+      height: auto;
+      border-radius: 8px;
+    }
+    .destination h3 {
+      margin: 10px 0;
+    }
+    .destination p {
+      font-size: 14px;
+      color: #555;
+    }
+
+    @media (max-width: 768px) {
+      .destination-list {
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Tupaia</h1>
+    <p>Your buddy to anywhere in the world</p>
+  </header>
+
+  <div class="container">
+    <!-- Destination Section -->
+    <div class="section">
+      <h2>Destinations</h2>
+      <div class="destination-list">
+        <div class="destination">
+          <img src="https://via.placeholder.com/300x150" alt="Tokyo">
+          <h3>Tokyo, Japan</h3>
+          <p>Explore the vibrant city life, cherry blossoms, and sushi culture.</p>
+        </div>
+        <div class="destination">
+          <img src="https://via.placeholder.com/300x150" alt="Bali">
+          <h3>Bali, Indonesia</h3>
+          <p>Relax on pristine beaches and explore scenic rice terraces.</p>
+        </div>
+        <div class="destination">
+          <img src="https://via.placeholder.com/300x150" alt="Seoul">
+          <h3>Seoul, South Korea</h3>
+          <p>Experience a perfect blend of tradition and modernity.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Travel Planner Section -->
+    <div class="section">
+      <h2>Plan Your Trip</h2>
+
+      <label for="country">Select a Country:</label>
+      <select id="country" onchange="updateRegions()">
+        <option value="">Select a Country</option>
+        <option value="Japan">Japan</option>
+        <option value="Indonesia">Indonesia</option>
+        <option value="South Korea">South Korea</option>
+        <option value="France">France</option>
+        <option value="USA">USA</option>
+        <option value="Italy">Italy</option>
+        <option value="Philippines">Philippines</option>
+        <option value="Germany">Germany</option>
+        <option value="Canada">Canada</option>
+        <option value="Australia">Australia</option>
+        <option value="Spain">Spain</option>
+        <option value="United Kingdom">United Kingdom</option>
+        <option value="Thailand">Thailand</option>
+        <option value="China">China</option>
+        <option value="Brazil">Brazil</option>
+        <option value="Mexico">Mexico</option>
+        <option value="India">India</option>
+        <option value="South Africa">South Africa</option>
+        <option value="Greece">Greece</option>
+        <option value="Netherlands">Netherlands</option>
+        <option value="Switzerland">Switzerland</option>
+      </select>
+
+      <label for="region">Select a Region:</label>
+      <select id="region">
+        <option value="">Select a Region</option>
+      </select>
+
+      <label for="days">Number of Days (Max 14):</label>
+      <input type="number" id="days" value="3" min="1" max="14">
+
+      <label for="category">Travel Category:</label>
+      <select id="category">
+        <option value="budget">Budget</option>
+        <option value="midrange">Mid-range</option>
+        <option value="luxury">Luxury</option>
+      </select>
+
+      <button onclick="generateItinerary()">Generate Itinerary</button>
+      <button onclick="calculateBudget()">Calculate Budget</button>
+
+      <div id="result"></div>
+      <div id="itineraryOutput"></div>
+    </div>
+
+    <!-- Itinerary Planner Section -->
+    <div class="section">
+      <h2>Itinerary Planner</h2>
+      <textarea placeholder="Add your plans here..."></textarea>
+      <button onclick="alert('Itinerary Saved!')">Save Itinerary</button>
+    </div>
+  </div>
+
+  <script>
+    const countryRegions = {
+      "Japan": ["Tokyo", "Kyoto", "Osaka", "Hokkaido", "Fukuoka", "Okinawa"],
+      "Indonesia": ["Bali", "Jakarta", "Yogyakarta", "Surabaya", "Medan"],
+      "South Korea": ["Seoul", "Busan", "Incheon", "Jeju", "Daegu"],
+      "France": ["Paris", "Lyon", "Marseille", "Nice", "Bordeaux"],
+      "USA": ["New York", "California", "Florida", "Texas", "Hawaii"],
+      "Italy": ["Rome", "Milan", "Florence", "Venice", "Naples"],
+      "Philippines": ["Manila", "Cebu", "Davao", "Baguio", "Iloilo"],
+      "Germany": ["Berlin", "Munich", "Hamburg", "Cologne", "Frankfurt"],
+      "Canada": ["Toronto", "Vancouver", "Montreal", "Ottawa", "Calgary"],
+      "Australia": ["Sydney", "Melbourne", "Brisbane", "Perth", "Adelaide"],
+      "Spain": ["Madrid", "Barcelona", "Seville", "Valencia", "Malaga"],
+      "United Kingdom": ["London", "Edinburgh", "Manchester", "Birmingham", "Liverpool"],
+      "Thailand": ["Bangkok", "Chiang Mai", "Phuket", "Ayutthaya", "Pattaya"],
+      "China": ["Beijing", "Shanghai", "Hong Kong", "Xi'an", "Chengdu"],
+      "Brazil": ["Rio de Janeiro", "Sao Paulo", "Brasilia", "Salvador", "Manaus"],
+      "Mexico": ["Mexico City", "Cancun", "Guadalajara", "Monterrey", "Cozumel"],
+      "India": ["Delhi", "Mumbai", "Bangalore", "Chennai", "Kolkata"],
+      "South Africa": ["Cape Town", "Johannesburg", "Durban", "Pretoria", "Port Elizabeth"],
+      "Greece": ["Athens", "Thessaloniki", "Santorini", "Crete", "Rhodes"],
+      "Netherlands": ["Amsterdam", "Rotterdam", "The Hague", "Utrecht", "Eindhoven"],
+      "Switzerland": ["Zurich", "Geneva", "Lucerne", "Bern", "Basel"]
+    };
+
+    const regionBudgets = {
+      "Tokyo": { "budget": 70, "midrange": 150, "luxury": 350 },
+      "Kyoto": { "budget": 110, "midrange": 300, "luxury": 800 },
+      "Osaka": { "budget": 130, "midrange": 300, "luxury": 700 },
+      "Hokkaido":{ "budget": 125, "midrange": 300, "luxury": 800 },
+      "Okinawa":{ "budget": 110, "midrange": 250, "luxury": 700 },
+"Fukuoka":{ "budget": 110, "midrange": 250, "luxury": 700},
+      "Bali":{ "budget": 50, "midrange": 150 , "luxury": 350 },
+"Jakarta":{ "budget": 40, "midrange": 120, "luxury": 250 },
+"Yogyakarta":{ "budget": 30, "midrange": 100, "luxury": 200 },
+"Surabaya":{ "budget": 35, "midrange": 110, "luxury": 220 },
+"Medan":{ "budget": 25, "midrange": 90, "luxury": 180 },
+      "Seoul":{ "budget": 50, "midrange": 150, "luxury": 300 },
+"Busan":{ "budget": 45, "midrange": 130, "luxury": 250 },
+"Incheon":{ "budget": 40, "midrange": 120, "luxury": 250 },
+      "Jeju":{ "budget": 40, "midrange": 120, "luxury": 250 },
+"Daegu":{ "budget": 35, "midrange": 110, "luxury": 220 },
+"Paris":{ "budget": 70, "midrange": 200, "luxury": 500 },
+"Lyon":{ "budget": 60, "midrange": 150, "luxury": 350 },
+"Marseille":{ "budget": 55, "midrange": 140, "luxury": 300 },
+"Nice":{ "budget": 80, "midrange": 220, "luxury": 450 },
+"Bordeaux":{ "budget": 65, "midrange": 180, "luxury": 400 },
+  "Rome": { "budget": 50, "midrange": 125, "luxury": 250 },
+  "Milan": { "budget": 60, "midrange": 130, "luxury": 260 },
+  "Florence": { "budget": 55, "midrange": 120, "luxury": 240 },
+  "Venice": { "budget": 65, "midrange": 135, "luxury": 270 },
+  "Naples": { "budget": 45, "midrange": 110, "luxury": 220 },
+  "Manila": { "budget": 30, "midrange": 70, "luxury": 150 },
+  "Cebu": { "budget": 25, "midrange": 60, "luxury": 130 },
+  "Davao": { "budget": 20, "midrange": 50, "luxury": 120 },
+  "Baguio": { "budget": 25, "midrange": 55, "luxury": 125 },
+  "Iloilo": { "budget": 20, "midrange": 50, "luxury": 120 },
+  "Toronto": { "budget": 70, "midrange": 150, "luxury": 300 },
+  "Vancouver": { "budget": 75, "midrange": 160, "luxury": 320 },
+  "Montreal": { "budget": 65, "midrange": 140, "luxury": 280 },
+  "Ottawa": { "budget": 60, "midrange": 130, "luxury": 260 },
+  "Calgary": { "budget": 65, "midrange": 140, "luxury": 280 },
+  "Madrid": { "budget": 50, "midrange": 110, "luxury": 220 },
+  "Barcelona": { "budget": 55, "midrange": 115, "luxury": 230 },
+  "Seville": { "budget": 45, "midrange": 100, "luxury": 200 },
+  "Valencia": { "budget": 50, "midrange": 105, "luxury": 210 },
+  "Malaga": { "budget": 45, "midrange": 100, "luxury": 200 },
+  "London": { "budget": 80, "midrange": 170, "luxury": 340 },
+  "Edinburgh": { "budget": 70, "midrange": 150, "luxury": 300 },
+  "Manchester": { "budget": 60, "midrange": 130, "luxury": 260 },
+  "Birmingham": { "budget": 60, "midrange": 130, "luxury": 260 },
+  "Liverpool": { "budget": 55, "midrange": 120, "luxury": 240 },
+  "Bangkok": { "budget": 25, "midrange": 60, "luxury": 120 },
+  "Chiang Mai": { "budget": 20, "midrange": 50, "luxury": 100 },
+  "Phuket": { "budget": 30, "midrange": 70, "luxury": 140 },
+  "Ayutthaya": { "budget": 20, "midrange": 50, "luxury": 100 },
+  "Pattaya": { "budget": 25, "midrange": 60, "luxury": 120 },
+  "Beijing": { "budget": 40, "midrange": 90, "luxury": 180 },
+  "Shanghai": { "budget": 45, "midrange": 100, "luxury": 200 },
+  "Hong Kong": { "budget": 50, "midrange": 110, "luxury": 220 },
+  "Xi'an": { "budget": 35, "midrange": 80, "luxury": 160 },
+  "Chengdu": { "budget": 30, "midrange": 70, "luxury": 140 },
+  "Rio de Janeiro": { "budget": 40, "midrange": 90, "luxury": 180 },
+  "Sao Paulo": { "budget": 45, "midrange": 95, "luxury": 190 },
+  "Brasilia": { "budget": 35, "midrange": 80, "luxury": 160 },
+  "Salvador": { "budget": 30, "midrange": 70, "luxury": 140 },
+  "Manaus": { "budget": 25, "midrange": 60, "luxury": 120 },
+  "Mexico City": { "budget": 30, "midrange": 70, "luxury": 140 },
+  "Cancun": { "budget": 35, "midrange": 80, "luxury": 160 },
+  "Guadalajara": { "budget": 25, "midrange": 60, "luxury": 120 },
+  "Monterrey": { "budget": 30, "midrange": 70, "luxury": 140 },
+  "Cozumel": { "budget": 35, "midrange": 80, "luxury": 160 },
+  "Delhi": { "budget": 20, "midrange": 50, "luxury": 100 },
+  "Mumbai": { "budget": 25, "midrange": 60, "luxury": 120 },
+  "Bangalore": { "budget": 20, "midrange": 50, "luxury": 100 },
+  "Chennai": { "budget": 20, "midrange": 50, "luxury": 100 },
+  "Kolkata": { "budget": 20, "midrange": 50, "luxury": 100 },
+  "Cape Town": { "budget": 40, "midrange": 90, "luxury": 180 },
+  "Johannesburg": { "budget": 35, "midrange": 80, "luxury": 160 },
+  "Durban": { "budget": 30, "midrange": 70, "luxury": 140 },
+  "Pretoria": { "budget": 35, "midrange": 80, "luxury": 160 },
+  "Port Elizabeth": { "budget": 30, "midrange": 70, "luxury": 140 },
+  "Athens": { "budget": 45, "midrange": 100, "luxury": 200 },
+  "Thessaloniki": { "budget": 40, "midrange": 90, "luxury": 180 },
+  "Santorini": { "budget": 50, "midrange": 110, "luxury": 220 },
+  "Crete": { "budget": 45, "midrange": 100, "luxury": 200 },
+  "Rhodes": { "budget": 45, "midrange": 100, "luxury": 200 },
+  "Amsterdam": { "budget": 70, "midrange": 150, "luxury": 300 },
+  "Rotterdam": { "budget": 60, "midrange": 130, "luxury": 260 },
+  "The Hague": { "budget": 60, "midrange": 130, "luxury": 260 },
+  "Utrecht": { "budget": 60, "midrange": 130, "luxury": 260 },
+  "Eindhoven": { "budget": 55, "midrange": 120, "luxury": 240 },
+  "Zurich": { "budget": 100, "midrange": 200, "luxury": 400 },
+  "Geneva": { "budget": 95, "midrange": 190, "luxury": 380 },
+  "Lucerne": { "budget": 90, "midrange": 180, "luxury": 360 },
+  "Bern": { "budget": 90, "midrange": 180, "luxury": 360 },
+  "Basel": { "budget": 90, "midrange": 180, "luxury": 360 },
+
+
+                
+
+
+      
+
+
+      // Add more region budgets as needed
+    };
+
+    // Update regions dropdown based on selected country
+    function updateRegions() {
+      const countrySelect = document.getElementById("country");
+      const regionSelect = document.getElementById("region");
+      const selectedCountry = countrySelect.value;
+
+      regionSelect.innerHTML = ""; // Clear existing options
+
+      if (selectedCountry && countryRegions[selectedCountry]) {
+        let placeholderOption = document.createElement("option");
+        placeholderOption.value = "";
+        placeholderOption.textContent = "Select a Region";
+        regionSelect.appendChild(placeholderOption);
+
+        countryRegions[selectedCountry].forEach(region => {
+          let option = document.createElement("option");
+          option.value = region;
+          option.textContent = region;
+          regionSelect.appendChild(option);
+        });
+      }
+    }
+
+    // Budget calculation function
+    function calculateBudget() {
+      const days = parseInt(document.getElementById("days").value);
+      const country = document.getElementById("country").value;
+      const region = document.getElementById("region").value;
+      const category = document.getElementById("category").value;
+      const resultDiv = document.getElementById("result");
+
+      if (!country || !category) {
+        resultDiv.innerHTML = "Please select a country and category.";
+        return;
+      }
+
+      // Use region-specific budget if available
+      const regionBudget = regionBudgets[region] || { "budget": 100, "midrange": 200, "luxury": 500 }; // fallback
+      const dailyBudget = regionBudget[category];
+      const totalBudget = dailyBudget * days;
+      resultDiv.innerHTML = `Estimated budget for ${region || country} (${days} days) in ${category} category: $${totalBudget}`;
+    }
+</script>
+</body>
+</html>
